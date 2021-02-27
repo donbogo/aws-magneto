@@ -12,8 +12,7 @@ provider:
   region: ${opt:region}
   timeout: 300
   memorySize: 512
-  deploymentBucket:
-    name: aws${opt:geoloc}-${opt:stage}${opt:acct}serverless
+  deploymentBucket: magneto.deploys.serverless
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -27,10 +26,10 @@ provider:
         - "arn:aws:dynamodb:${self:provider.region}:${opt:account}:table/${self:provider.environment.TABLA_STATS}"
   apiGateway:
     restApiId:
-      'Fn::ImportValue': ${opt:stage}-magneto-api-ApiID
+      'Fn::ImportValue': api-gateway-magneto-ApiID
     restApiResources:
       /v1/magneto/:
-        'Fn::ImportValue': ${opt:stage}-magneto-api-magnetoV1ID
+        'Fn::ImportValue': api-gateway-magneto-magnetoV1ID
   environment:
     LOGGER_ROOT_LEVEL: ${opt:log}
     REGION: ${opt:region}
@@ -39,7 +38,7 @@ provider:
  
 functions:
   mutant:
-    handler: src/magneto/app.isMutant
+    handler: src/magneto/mutante.isMutant
     description: Indica si un humano es mutante
     events:
       - http:
@@ -48,7 +47,7 @@ functions:
           cors:
             origin: '*'
   stats:   
-    handler: src/magneto/app.stats
+    handler: src/magneto/estadisticas.stats
     description: Estadísticas de las verificaciones de ADN
     events:
       - http:

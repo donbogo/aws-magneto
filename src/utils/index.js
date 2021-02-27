@@ -12,6 +12,7 @@ module.exports.validarLetras = (adn) => {
         return letras.match(/[ATCG]/g).length === letras.length;
     } catch (error) {
         console.error(error);
+        throw new Error('Error validarLetras');
     }
     return false;
 };
@@ -65,9 +66,9 @@ module.exports.rotarMatriz = (matrix) => { // function statement
     return matrix;
 };
 
-module.exports.respuestaServicio = (statusCode, codigo, mensaje) => {
+module.exports.respuestaServicio = (statusCode, codigo, mensaje, respuesta) => {
     return {
         statusCode: statusCode,
-        body: JSON.stringify({ codigo: codigo, mensaje: mensaje }, null, 2)
+        body: JSON.stringify({ codigo: codigo, mensaje: mensaje, respuesta: respuesta ? respuesta : {} }, null, 2)
     };
 };

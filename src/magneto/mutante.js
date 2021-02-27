@@ -14,40 +14,63 @@ AWS.config.update({ region: process.env.REGION });
 /**
  * Sabrás si un humano es mutante, si encuentras más de una secuencia de cuatro letras iguales, 
  * de forma oblicua, horizontal o vertical.
- * @param {*} dna 
+ * @param {*} event 
  */
 module.exports.isMutant = async (event) => {
     try {
-        let dna = JSON.parse(event.body ? event.body : event);
-        if (utils.validarLetras(dna)) {
-            dna = dna.replace(/[^A-Z,]/g, '');
-            let adnArreglo = dna.split(',');
-            let secuencias = 0;
-            secuencias = await horizontal.adnHorizontal(adnArreglo);
-            if (!utils.esMutante(secuencias)) {
-                let arreglo = utils.separarLetrasAdn(adnArreglo);
-                let arregloVertical = utils.rotarMatriz(Object.assign([], arreglo));
-                secuencias += await vertical.adnVertical(arregloVertical);
-                if (!utils.esMutante(secuencias)) {
-                    secuencias += await oblicua.adnOblicua(Object.assign([], arreglo));
-                    if (!utils.esMutante(secuencias)) {
-                        let arregloOblicua = utils.rotarMatriz(Object.assign([], arreglo));
-                        secuencias += await oblicua.adnOblicua(arregloOblicua);
-                    }
-                }
-            }
+        let body = JSON.parse(event.body ? event.body : event);
+        let adn = body.adn.toString();
+        if (utils.validarLetras(adn)) {
+            adn = adn.replace(/[^A-Z,]/g, '');
+            let adnArreglo = adn.split(',');
+            let validar = [];
+            let arreglo = utils.separarLetrasAdn(adnArreglo);
+            let matrizRotada = utils.rotarMatriz(Object.assign([], arreglo));
+            validar.push(horizontal.adnHorizontal(adnArreglo));
+            validar.push(vertical.adnVertical(Object.assign([], matrizRotada)));
+            validar.push(oblicua.adnOblicua(Object.assign([], arreglo)));
+            validar.push(oblicua.adnOblicua(Object.assign([], matrizRotada)));
+            let result = await Promise.all(validar);
+            let secuencias = result.reduce((a, b) => a + b, 0);
             let esMutante = utils.esMutante(secuencias);
             let dynamo = new AWS.DynamoDB.DocumentClient();
+            let _adn = await consultarAdn(adn, dynamo);
             await guardarAdn(adn, esMutante, dynamo);
-            await actualizarEstadisticas(esMutante, dynamo);
+            if (_adn && !_adn.Item) {
+                await actualizarEstadisticas(esMutante, dynamo);
+            }
             return utils.respuestaServicio(esMutante ? 200 : 403, esMutante ? 200 : 403, esMutante ? 'OK' : 'Forbidden');
         }
     } catch (error) {
         console.error(error);
+        return utils.respuestaServicio(500, 500, 'Error');
     }
     return utils.respuestaServicio(403, 403, 'Forbidden');
 };
 
+/**
+ * 
+ * @param {*} adn 
+ * @param {*} dynamo 
+ */
+let consultarAdn = async (adn, dynamo) => {
+    try {
+        let params = {
+            TableName: TABLA_ADNS,
+            Key: { adn: adn }
+        };
+        return await dynamo.get(params).promise();
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+/**
+ * 
+ * @param {*} adn 
+ * @param {*} esMutante 
+ * @param {*} dynamo 
+ */
 let guardarAdn = async (adn, esMutante, dynamo) => {
     try {
         let params = {
@@ -63,6 +86,11 @@ let guardarAdn = async (adn, esMutante, dynamo) => {
     }
 };
 
+/**
+ * 
+ * @param {*} esMutante 
+ * @param {*} dynamo 
+ */
 let actualizarEstadisticas = async (esMutante, dynamo) => {
     try {
         let params = {
