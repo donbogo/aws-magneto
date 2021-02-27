@@ -1,0 +1,93 @@
+service: aws-magneto
+
+plugins:
+  - serverless-dynamodb-autoscaling
+  - serverless-dynamodb-pitr
+  - serverless-prune-plugin
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage}
+  region: ${opt:region}
+  timeout: 300
+  memorySize: 512
+  deploymentBucket:
+    name: aws${opt:geoloc}-${opt:stage}${opt:acct}serverless
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - apigateway:*
+      Resource: "arn:aws:apigateway:*::/*"
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - "arn:aws:dynamodb:${self:provider.region}:${opt:account}:table/${self:provider.environment.TABLA_ADNS}" 
+        - "arn:aws:dynamodb:${self:provider.region}:${opt:account}:table/${self:provider.environment.TABLA_STATS}"
+  apiGateway:
+    restApiId:
+      'Fn::ImportValue': ${opt:stage}-magneto-api-ApiID
+    restApiResources:
+      /v1/magneto/:
+        'Fn::ImportValue': ${opt:stage}-magneto-api-magnetoV1ID
+  environment:
+    LOGGER_ROOT_LEVEL: ${opt:log}
+    REGION: ${opt:region}
+    TABLA_ADNS: ${opt:stage}-adns
+    TABLA_STATS: ${opt:stage}-stats
+ 
+functions:
+  mutant:
+    handler: src/magneto/app.isMutant
+    description: Indica si un humano es mutante
+    events:
+      - http:
+          path: /v1/magneto/mutant
+          method: post
+          cors:
+            origin: '*'
+  stats:   
+    handler: src/magneto/app.stats
+    description: Estadísticas de las verificaciones de ADN
+    events:
+      - http:
+          path: /v1/magneto/stats
+          method: get
+          cors:
+            origin: '*'
+
+resources:
+  Resources:
+    TablaAdns:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLA_ADNS}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: adn
+            AttributeType: S
+        KeySchema:
+          - AttributeName: adn
+            KeyType: HASH
+    TablaStats:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.TABLA_STATS}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: stats
+            AttributeType: S
+        KeySchema:
+          - AttributeName: stats
+            KeyType: HASH
+
+custom:
+  pitr:
+    - tableName: ${self:provider.environment.TABLA_ADNS}
+      enabled: true
+    - tableName: ${self:provider.environment.TABLA_STATS}
+      enabled: true
+  prune:
+    automatic: true
+    number: 3
