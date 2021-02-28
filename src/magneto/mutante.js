@@ -18,26 +18,31 @@ AWS.config.update({ region: process.env.REGION });
  */
 module.exports.isMutant = async (event) => {
     try {
+        // Body de la petición
         let body = JSON.parse(event.body ? event.body : event);
         let adn = body.adn.toString();
-        if (utils.validarLetras(adn)) {
-            adn = adn.replace(/[^A-Z,]/g, '');
-            let adnArreglo = adn.split(',');
-            let validar = [];
-            let arreglo = utils.separarLetrasAdn(adnArreglo);
-            let matrizRotada = utils.rotarMatriz(Object.assign([], arreglo));
-            validar.push(horizontal.adnHorizontal(adnArreglo));
-            validar.push(vertical.adnVertical(Object.assign([], matrizRotada)));
-            validar.push(oblicua.adnOblicua(Object.assign([], arreglo)));
-            validar.push(oblicua.adnOblicua(Object.assign([], matrizRotada)));
-            let result = await Promise.all(validar);
-            let secuencias = result.reduce((a, b) => a + b, 0);
-            let esMutante = utils.esMutante(secuencias);
+        if (utils.validarLetras(adn)) { // Validar que se cumplan los requerimientos de las letras en la matriz
+            adn = adn.replace(/[^A-Z,]/g, ''); // Eliminar caracteres
             let dynamo = new AWS.DynamoDB.DocumentClient();
+            let esMutante = false;
+            // Se consulta el adn ingresado
             let _adn = await consultarAdn(adn, dynamo);
-            await guardarAdn(adn, esMutante, dynamo);
-            if (_adn && !_adn.Item) {
-                await actualizarEstadisticas(esMutante, dynamo);
+            if (_adn && !_adn.Item) { // Se valida que el adn no exista, que no se haya validado anteriormente
+                let adnArreglo = adn.split(','); // Arreglo con las filas de las secuencias
+                let validar = []; // Arreglo de promesas para las validaciones: oblicua, horizontal y vertical
+                let arreglo = utils.separarLetrasAdn(adnArreglo); // Arreglo con las secuencias del adn
+                let matrizRotada = utils.rotarMatriz(Object.assign([], arreglo)); // Se rota o se gira la matriz 90 grados de izquierda a derecha
+                validar.push(horizontal.adnHorizontal(adnArreglo)); // Validaciones horizontales
+                validar.push(vertical.adnVertical(Object.assign([], matrizRotada))); // Validaciones verticales
+                validar.push(oblicua.adnOblicua(Object.assign([], arreglo))); // Validaciones diagonales de izquierda a derecha
+                validar.push(oblicua.adnOblicua(Object.assign([], matrizRotada))); // Validaciones de derecha a izquierda
+                let result = await Promise.all(validar); // Resultado con las validaciones del adn
+                let secuencias = result.reduce((a, b) => a + b, 0); // Cantidad de secuencias encontradas en la matriz
+                esMutante = utils.esMutante(secuencias); // Se valida si es o no mutante
+                await guardarAdn(adn, esMutante, dynamo); // Se almacena el adn
+                await actualizarEstadisticas(esMutante, dynamo); // Se actualizan las estadisticas
+            } else {
+                esMutante = _adn.Item.esMutante;
             }
             return utils.respuestaServicio(esMutante ? 200 : 403, esMutante ? 200 : 403, esMutante ? 'OK' : 'Forbidden');
         }
@@ -49,12 +54,13 @@ module.exports.isMutant = async (event) => {
 };
 
 /**
- * 
+ * Consulta un adn en la base de datos
  * @param {*} adn 
  * @param {*} dynamo 
  */
 let consultarAdn = async (adn, dynamo) => {
     try {
+        // Parametros de la consulta
         let params = {
             TableName: TABLA_ADNS,
             Key: { adn: adn }
@@ -66,13 +72,14 @@ let consultarAdn = async (adn, dynamo) => {
 };
 
 /**
- * 
+ * Almacena un adn en la base de datos
  * @param {*} adn 
  * @param {*} esMutante 
  * @param {*} dynamo 
  */
 let guardarAdn = async (adn, esMutante, dynamo) => {
     try {
+        // Parametros para el almacenamiento
         let params = {
             TableName: TABLA_ADNS,
             Item: {
@@ -87,12 +94,13 @@ let guardarAdn = async (adn, esMutante, dynamo) => {
 };
 
 /**
- * 
+ * Actualiza las estadisticas de validación del adn
  * @param {*} esMutante 
  * @param {*} dynamo 
  */
 let actualizarEstadisticas = async (esMutante, dynamo) => {
     try {
+        // Parametros de actualización de estadisticas
         let params = {
             TableName: TABLA_STATS,
             Key: { stats: 'magneto' },

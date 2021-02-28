@@ -32,6 +32,7 @@ module.exports.esMutante = (secuencias) => {
  */
 module.exports.validarSecuenciaLetra = (adn, letra) => {
     return new Promise(async (resolve) => {
+        // Expresión regular para la validación de la secuencia
         let regexObj = new RegExp(`${letra}{${config.SECUENCIALETRAS}}`, 'g');
         resolve(regexObj.test(adn));
     });
@@ -66,6 +67,13 @@ module.exports.rotarMatriz = (matrix) => { // function statement
     return matrix;
 };
 
+/**
+ * JSON respuesta de los servicios
+ * @param {*} statusCode 
+ * @param {*} codigo 
+ * @param {*} mensaje 
+ * @param {*} respuesta 
+ */
 module.exports.respuestaServicio = (statusCode, codigo, mensaje, respuesta) => {
     return {
         statusCode: statusCode,

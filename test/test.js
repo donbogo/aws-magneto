@@ -42,6 +42,37 @@ describe('Test mutant OK', function () {
     });
 });
 
+describe('Test mutant consulta adn', function () {
+    this.timeout(0);
+    beforeEach(function () {
+        AWSMock.mock('DynamoDB.DocumentClient', 'get', function (params, callback) {
+            callback(null, { Item: { adn: "ATGCCG,CAGTGC,TTAGGT,AGGAGG,ACCTCA,TCGAGG", esMutante: true } });
+        });
+        AWSMock.mock('DynamoDB.DocumentClient', 'put', function (params, callback) {
+            callback(null, true);
+        });
+        AWSMock.mock('DynamoDB.DocumentClient', 'update', function (params, callback) {
+            callback(null, true);
+        });
+    });
+    it('mutant test consulta 200', async () => {
+        const result = await mutante.isMutant({
+            'body': "{\"adn\":[\"ATGCCG\",\"CAGTGC\",\"TTAGGT\",\"AGGAGG\",\"ACCTCA\",\"TCGAGG\"]}",
+            'method': 'POST',
+            'headers': {},
+            'query': {},
+            'path': {}
+        }, { 'awsRequestId': '3000' });
+        console.log('-------------------------------------------------------------');
+        console.log('Respuesta es mutante', JSON.stringify(result));
+        console.log('-------------------------------------------------------------');
+        expect(result.statusCode).to.equal(200);
+    });
+    after(function () {
+        AWSMock.restore();
+    });
+});
+
 describe('Test mutant Forbidden', function () {
     this.timeout(0);
     beforeEach(function () {

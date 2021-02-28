@@ -1,5 +1,6 @@
 'use strict';
 
+// Variables globales
 module.exports = {
     ADNLETRAS: ['A', 'T', 'C', 'G'], // Las letras de los Strings solo pueden ser: (A,T,C,G)
     SECUENCIALETRAS: 4, // Secuencia de cuatro letras iguales
