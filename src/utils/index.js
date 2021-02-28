@@ -12,7 +12,6 @@ module.exports.validarLetras = (adn) => {
         return letras.match(/[ATCG]/g).length === letras.length;
     } catch (error) {
         console.error(error);
-        throw new Error('Error validarLetras');
     }
     return false;
 };

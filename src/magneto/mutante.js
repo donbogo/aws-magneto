@@ -46,11 +46,11 @@ module.exports.isMutant = async (event) => {
             }
             return utils.respuestaServicio(esMutante ? 200 : 403, esMutante ? 200 : 403, esMutante ? 'OK' : 'Forbidden');
         }
+        return utils.respuestaServicio(400, 400, 'Bad Request');
     } catch (error) {
         console.error(error);
         return utils.respuestaServicio(500, 500, 'Error');
     }
-    return utils.respuestaServicio(403, 403, 'Forbidden');
 };
 
 /**

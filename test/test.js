@@ -104,13 +104,13 @@ describe('Test mutant Forbidden', function () {
     });
 });
 
-describe('Test mutant Fallido', function () {
+describe('Test mutant Bad Request', function () {
     this.timeout(0);
     beforeEach(function () {
     });
-    it('mutant test error', async () => {
+    it('mutant test 400', async () => {
         const result = await mutante.isMutant({
-            'body': "{\"adn\":[]}",
+            'body': "{\"adn\":[\"ATCG\",\"TCGA\",\"CGAT\",\"GATZ\"]}",
             'method': 'POST',
             'headers': {},
             'query': {},
@@ -119,7 +119,7 @@ describe('Test mutant Fallido', function () {
         console.log('-------------------------------------------------------------');
         console.log('Respuesta es mutante', JSON.stringify(result));
         console.log('-------------------------------------------------------------');
-        expect(result.statusCode).to.equal(500);
+        expect(result.statusCode).to.equal(400);
     });
     after(function () {
         AWSMock.restore();
