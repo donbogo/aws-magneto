@@ -3,6 +3,13 @@
 Clonar o descargar el proyecto:
 - Clone: https://github.com/donbogo/aws-magneto.git
 - Download zip: https://github.com/donbogo/aws-magneto/archive/main.zip
+
+___
+
+### Solución
+
+![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/aws-solucion.jpg)
+
 ___
 
 ### Instalación
@@ -13,12 +20,6 @@ Una vez clonado o descargado el proyecto, ubicarse en el directorio: **./aws-mag
 
 Para la instalación del proyecto ejecutar el comando:
 > $ npm install
-
-___
-
-### Solución
-
-![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/aws-solucion.jpg)
 
 ___
 
