@@ -36,12 +36,13 @@ ___
 
 ### Servicios web
 
+- /magneto/mutant
 ![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/ws-mutant.jpg)
 
+ Ejemplo body:
 `{"adn": ["ATGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"]}`
 
-![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/ws-mutant.jpg)
-
+- /magneto/stats
 ![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/ws-stats.jpg)
 
 ___
