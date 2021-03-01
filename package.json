@@ -1,0 +1,35 @@
+{
+  "name": "aws-magneto",
+  "version": "1.0.0",
+  "description": "Detectar si un humano es mutante basándose en su secuencia de ADN.",
+  "main": "index.js",
+  "scripts": {
+    "test": "REGION=us-east-1 STAGE=dev TABLA_ADNS=dev-adns TABLA_STATS=dev-stats nyc --reporter=lcov --reporter=text-summary mocha test/*.js --reporter=nyan",
+    "test-win": "set REGION=us-east-1 && set STAGE=dev && set TABLA_ADNS=dev-adns && set TABLA_STATS=dev-stats && nyc --reporter=lcov --reporter=text-summary mocha test/*.js --reporter=nyan"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donbogo/aws-magneto.git"
+  },
+  "keywords": [],
+  "author": "donbogo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/donbogo/aws-magneto/issues"
+  },
+  "homepage": "https://github.com/donbogo/aws-magneto#readme",
+  "dependencies": {
+    "aws-sdk": "^2.853.0",
+    "mathjs": "^9.2.0"
+  },
+  "devDependencies": {
+    "aws-sdk-mock": "^5.1.0",
+    "chai": "^4.3.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^8.3.0",
+    "nyc": "^15.1.0",
+    "serverless-dynamodb-autoscaling": "^0.6.2",
+    "serverless-dynamodb-pitr": "^0.1.1",
+    "serverless-prune-plugin": "^1.4.3"
+  }
+}
