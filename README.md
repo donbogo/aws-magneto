@@ -54,6 +54,12 @@ Para correr las pruebas y la cobertura de código, primero instalar las dependen
  
  > $ npm install
  
+ - Linux, Mac
+ 
  > $ npm test
+ 
+ - Windows
+ 
+ > $ npm run test-win
 
 <br>
