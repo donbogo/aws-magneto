@@ -3,7 +3,7 @@
 const AWS = require('aws-sdk');
 const utils = require('../utils');
 
-const TABLA_ADNS = process.env.TABLA_ADNS;
+const TABLA_STATS = process.env.TABLA_STATS;
 
 AWS.config.update({ region: process.env.REGION });
 
@@ -13,15 +13,18 @@ AWS.config.update({ region: process.env.REGION });
  */
 module.exports.stats = async (event) => {
     try {
+        console.log(event);
         // JSON para las estadísticas de las verificaciones del ADN
         let estadistica = { count_mutant_dna: 0, count_human_dna: 0, ratio: 0 };
         let dynamo = new AWS.DynamoDB.DocumentClient();
         // Parametros de consulta
         let params = {
-            TableName: TABLA_ADNS,
+            TableName: TABLA_STATS,
             Key: { stats: 'magneto' }
         };
+        console.log(params);
         let result = await dynamo.get(params).promise();
+        console.log(result);
         // Se valida el resultado de la consulta
         if (result && result.Item) {
             // Mapeo del resultado
