@@ -1,14 +1,14 @@
 # aws-magneto
 
-Clonar o descargar el proyecto:
-- Clone: https://github.com/donbogo/aws-magneto.git
-- Download zip: https://github.com/donbogo/aws-magneto/archive/main.zip
-
-___
-
 ### Solución
 
 ![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/aws-solucion.jpg)
+
+___
+
+Clonar o descargar el proyecto:
+- Clone: https://github.com/donbogo/aws-magneto.git
+- Download zip: https://github.com/donbogo/aws-magneto/archive/main.zip
 
 ___
 
@@ -37,12 +37,14 @@ ___
 ### Servicios web
 
 - /magneto/mutant
+
 ![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/ws-mutant.jpg)
 
  Ejemplo body:
 `{"adn": ["ATGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"]}`
 
 - /magneto/stats
+
 ![](https://raw.githubusercontent.com/donbogo/aws-magneto/main/ws-stats.jpg)
 
 ___
@@ -52,6 +54,12 @@ Para correr las pruebas y la cobertura de código, primero instalar las dependen
  
  > $ npm install
  
+ - Linux, Mac
+ 
  > $ npm test
+ 
+ - Windows
+ 
+ > $ npm run test-win
 
 <br>
