@@ -16,7 +16,7 @@ module.exports.adnHorizontal = async (adn) => {
             for (let i = 0; i < adn.length; i++) {
                 // Validación de la secuencia por cada letra
                 for (let x = 0; x < config.ADNLETRAS.length; x++) {
-                    horizontal.push(utils.validarSecuenciaLetra(adn[i], config.ADNLETRAS[x]));
+                    horizontal.push(utils.validarSecuenciaLetra(adn[i].toString().replace(/[^A-Z]/g, ''), config.ADNLETRAS[x]));
                 }
             }
             // Resultado de las validaciones de las secuencias del adn
